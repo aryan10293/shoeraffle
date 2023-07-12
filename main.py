@@ -1,8 +1,10 @@
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from dotenv import load_dotenv
 import certifi
 import random
+import json
 import os
 load_dotenv()
 first_names = [
@@ -46,24 +48,35 @@ def shoe_raffle():
         raffle_winners.insert_many(winner)
 
 
-try:
-    db = client.shoeraffles
-    collection = db['shoes']
+def run_program():
+    try:
+        db = client.shoeraffles
+        collection = db['shoes']
 
-    for _ in range(50):
-        first = random.randrange(0, 20)
-        last = random.randrange(0, 20)
-        random_phone = f'510-{str(random.randrange(0, 9))}{str(random.randrange(0, 9))}{str(random.randrange(0, 9))}-{str(random.randrange(0, 9))}{str(random.randrange(0, 9))}{str(random.randrange(0, 9))}{str(random.randrange(0, 9))}'
-        random_name = f'{first_names[first]} {last_names[last]}'
-        shoe_entry_data.append({
-            "name": random_name,
-            "size": size_list[random.randrange(0, len(size_list))],
-            "phone_number": random_phone,
-            "email": f"{first_names[first]}{last_names[last]}@yahoo.com"
-        })
+        for _ in range(50):
+            first = random.randrange(0, 20)
+            last = random.randrange(0, 20)
+            random_phone = f'510-{str(random.randrange(0, 9))}{str(random.randrange(0, 9))}{str(random.randrange(0, 9))}-{str(random.randrange(0, 9))}{str(random.randrange(0, 9))}{str(random.randrange(0, 9))}{str(random.randrange(0, 9))}'
+            random_name = f'{first_names[first]} {last_names[last]}'
+            shoe_entry_data.append({
+                "name": random_name,
+                "size": size_list[random.randrange(0, len(size_list))],
+                "phone_number": random_phone,
+                "email": f"{first_names[first]}{last_names[last]}@yahoo.com"
+            })
 
-    entries_added = collection.insert_many(shoe_entry_data)
-    shoe_raffle()
+        entries_added = collection.insert_many(shoe_entry_data)
+        shoe_raffle()
 
-except Exception as e:
-    print(f"An error occurred: {e}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
+class PracticingPythonOnTheBackend(BaseHTTPRequestHandler):
+
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        response = {'message': 'This is a GET request'}
+        self.wfile.write(json.dumps(response).encode())
