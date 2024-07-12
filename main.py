@@ -66,4 +66,4 @@ try:
     shoe_raffle()
 
 except Exception as e:
-    print(f"An error occurred: {e} fuck")
+    print(f"An error occurred: {e}")
