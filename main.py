@@ -1,6 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
+from urllib.parse import urlparse, parse_qs
 from dotenv import load_dotenv
 import certifi
 import random
@@ -27,7 +28,9 @@ client = MongoClient(os.environ['uri'], server_api=ServerApi(
 
 
 def shoe_raffle():
-    raffle_winners = db['winners']
+    db = client.shoeraffles
+    raffle_winners = db.shoeraffles['winners']
+    collection = db['shoes']
     shoes_sizes_instock = {
         '8': 1,
         '8.5': 1,
@@ -73,19 +76,50 @@ def run_program():
 
 
 class PracticingPythonOnTheBackend(BaseHTTPRequestHandler):
+    db = client.shoeraffles
+    raffle_winners = db.shoeraffles['winners']
+    collection = db['shoes']
 
     def do_GET(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.end_headers()
-        response = {'message': 'This is a GET request'}
-        self.wfile.write(json.dumps(response).encode())
+        parsed_path = urlparse(self.path)
+        path = parsed_path.path
+        query_params = parse_qs(parsed_path.query)
+        if self.path == '/':
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            print('hello')
+            self.wfile.write(b'Hello, World!')
+
+        elif self.path == '/size':
+
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+
+            # Extract 'size' parameter from query string
+            size = query_params.get('size', [None])[0]
+            if size:
+                try:
+                    # Convert the size parameter to an integer
+                    size = int(size)
+                    response = f'The size is {size}'
+                except ValueError:
+                    response = 'Invalid size parameter. Please enter a valid integer.'
+            else:
+                response = 'No size parameter provided.'
+
+                self.wfile.write(response.encode())
+        else:
+            self.send_response(404)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            self.wfile.write(b'404 Not Found')
 
 
 def run(server_class=HTTPServer, handler_class=PracticingPythonOnTheBackend, port=8000):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
-    print(f'Starting server on  {port}...')
+    print(f'Starting server on port {port}...')
     httpd.serve_forever()
 
 
