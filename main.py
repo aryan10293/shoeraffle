@@ -106,7 +106,7 @@ class PracticingPythonOnTheBackend(BaseHTTPRequestHandler):
                 except ValueError:
                     response = 'Invalid size parameter. Please enter a valid integer.'
             else:
-                response = 'No  parameter provided.'
+                response = 'No size parameter provided.'
 
                 self.wfile.write(response.encode())
         else:
