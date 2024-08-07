@@ -119,7 +119,7 @@ class PracticingPythonOnTheBackend(BaseHTTPRequestHandler):
 def run(server_class=HTTPServer, handler_class=PracticingPythonOnTheBackend, port=8000):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
-    print(f'Starting server on port {port}...')
+    print(f'Starting server on port {port}..')
     httpd.serve_forever()
 
 
