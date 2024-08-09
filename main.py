@@ -80,19 +80,18 @@ class PracticingPythonOnTheBackend(BaseHTTPRequestHandler):
     raffle_winners = db.shoeraffles['winners']
     collection = db['shoes']
 
-    def set_handlers(self):
-        def _set_headers(self):
-            self.send_header('Content-type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.send_header('Access-Control-Allow-Methods',
-                             'GET, POST, OPTIONS')
-            self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-            self.end_headers()
+    def _set_headers(self):
+        self.send_header('Content-type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin',
+                         'http://127.0.0.1:5500')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers',
+                         'Content-Type, X-Requested-With')
+        self.end_headers()
 
-        def do_OPTIONS(self):
-            # Handle preflight requests for CORS
-            self.send_response(204)
-            self.end_headers()
+    def do_OPTIONS(self):
+        self.send_response(200, "ok")
+        self._set_headers()
 
     def do_GET(self):
         parsed_path = urlparse(self.path)
@@ -100,12 +99,11 @@ class PracticingPythonOnTheBackend(BaseHTTPRequestHandler):
         query_params = parse_qs(parsed_path.query)
         if self.path == '/':
             self.send_response(200)
-            self.send_header('Content-type', 'application/json')
+            self._set_headers()
             self.end_headers()
 
             response = {'lol': 'lmao'}
-            response_json = json.dumps(response)
-            self.wfile.write(response_json.encode('utf-8'))
+            self.wfile.write(json.dumps(response).encode('utf-8'))
 
             print('hellowiefbguoifrboeirfherioe')
 
