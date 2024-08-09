@@ -89,6 +89,11 @@ class PracticingPythonOnTheBackend(BaseHTTPRequestHandler):
                          'Content-Type, X-Requested-With')
         self.end_headers()
 
+    def when_success(self):
+        self.send_response(200)
+        self._set_headers()
+        self.end_headers()
+
     def do_OPTIONS(self):
         self.send_response(200, "ok")
         self._set_headers()
@@ -98,14 +103,13 @@ class PracticingPythonOnTheBackend(BaseHTTPRequestHandler):
         path = parsed_path.path
         query_params = parse_qs(parsed_path.query)
         if self.path == '/':
-            self.send_response(200)
-            self._set_headers()
-            self.end_headers()
-
-            response = {'lol': 'lmao'}
-            self.wfile.write(json.dumps(response).encode('utf-8'))
-
-            print('hellowiefbguoifrboeirfherioe')
+            self.when_success()
+            db = client.shoeraffles
+            raffle_winners = db.shoeraffles['winners']
+            collection = db['shoes']
+            results = collection.find()
+            results = {'entries': list(results)}
+            self.wfile.write(json.dumps(results, default=str).encode('utf-8'))
 
         elif self.path == '/size':
 
